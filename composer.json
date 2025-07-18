@@ -1,0 +1,28 @@
+{
+    "name": "bachir-uchiwa/projetmaxit",
+    "autoload": {
+        "psr-4": {
+            "BachirUchiwa\\Projetmaxit\\": "src/",
+            "App\\Entity\\": "src/entity/",
+            "App\\Repository\\": "src/repository/",
+            "App\\Service\\": "src/service/",
+            "App\\Controller\\": "src/controller/",
+            "App\\Core\\": "app/core/",
+            "App\\Config\\": "app/config/",
+            "App\\Config\\Middleware" : "app/config/middleware",
+            "App\\Core\\Abstract\\": "app/core/abstract/",
+            "Route\\": "routes"
+
+
+        }
+    },
+    "authors": [
+        {
+            "name": "Uchiwa75567",
+            "email": "pabassdiame76@gmail.com"
+        }
+    ],
+    "require": {
+        "vlucas/phpdotenv": "^5.6"
+    }
+}
