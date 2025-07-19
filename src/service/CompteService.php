@@ -22,4 +22,12 @@ class CompteService {
     public function getSolde(int $userId): ?array {
         return $this->compteRepository->getSoldeByUserId($userId);
     }
+
+    public function ajouterSecondaire(array $data): bool {
+        return $this->compteRepository->ajouterSecondaire($data);
+    }
+
+    public function updateSolde(int $compteId, float $nouveauSolde): void {
+        $this->compteRepository->updateSolde($compteId, $nouveauSolde);
+    }
 }

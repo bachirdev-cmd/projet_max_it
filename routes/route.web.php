@@ -40,6 +40,14 @@ return $routes=[
         'controller' => SecurityController::class,
         'action' => 'createaccount'
     ],
+    '/ajout'=> [
+        'controller' => CompteController::class,
+        'action' => 'storeSecondaire'
+    ],
+    '/accessaccount' => [
+        'controller' => SecurityController::class,
+        'action' => 'accessaccount'
+    ],
     
 
 ];

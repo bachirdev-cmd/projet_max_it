@@ -1,7 +1,8 @@
 <?php
 
-$dotenv = Dotenv\Dotenv::createImmutable('../');
-$dotenv->load();
+if (!isset($_ENV['APP_URL'])) {
+    throw new \RuntimeException('Le fichier .env n\'est pas chargé correctement');
+}
 
 define('App_URL', $_ENV['APP_URL']);
 define('host', $_ENV['DB_HOST']);

@@ -30,4 +30,58 @@ class CompteRepository {
         $result = $stmt->fetch(PDO::FETCH_ASSOC); 
         return $result;
     }
+
+    public function ajouterSecondaire(array $data): bool
+    {
+        try {
+            error_log("Tentative d'ajout compte secondaire avec données: " . print_r($data, true));
+            
+            $sql = "INSERT INTO compte (numero, datecreation, solde, numerotel, typecompte, userid)
+                VALUES (:numero, :datecreation, :solde, :numerotel, 'secondaire', :userid)";
+            $stmt = $this->database->getPdo()->prepare($sql);
+
+            $result = $stmt->execute([
+                ':numero' => $data['numero'],
+                ':datecreation' => $data['datecreation'],
+                ':solde' => $data['solde'],
+                ':numerotel' => $data['numerotel'],
+                ':userid' => $data['userid']
+            ]);
+
+            if (!$result) {
+                $errorInfo = $stmt->errorInfo();
+                error_log("Erreur SQL: " . print_r($errorInfo, true));
+            }
+
+            return $result;
+        } catch (\Exception $e) {
+            error_log("Exception lors de l'ajout: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function findByUser(int $userId): array
+    {
+        $sql = "SELECT * FROM compte WHERE userid = :userId";
+        $stmt = $this->database->getPdo()->prepare($sql);
+        $stmt->execute(['userId' => $userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function updateSolde(int $compteId, float $nouveauSolde): void
+    {
+        $sql = "UPDATE compte SET solde = :solde WHERE id = :id";
+        $stmt = $this->database->getPdo()->prepare($sql);
+        $stmt->execute([
+            ':solde' => $nouveauSolde,
+            ':id' => $compteId
+        ]);
+    }
+    public function findComptesSecondairesByUserId(int $userId): array
+    {
+        $sql = "SELECT * FROM compte WHERE userid = :userId AND typecompte = 'secondaire'";
+        $stmt = $this->database->getPdo()->prepare($sql);
+        $stmt->execute(['userId' => $userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

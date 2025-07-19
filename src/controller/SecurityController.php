@@ -77,5 +77,17 @@ class SecurityController extends AbstractController
         $this->communLayout = 'baseLayout';
         $this->renderIndex('createaccount/createaccount');
     }
+
+    public function accessaccount() {
+        $this->communLayout = 'baseLayout';
+        $user = $this->session->get('user');
+        $comptesSecondaires = [];
+        if ($user) {
+            $comptesSecondaires = \App\Core\App::getDependency('CompteRepository')->findComptesSecondairesByUserId($user['id']);
+        }
+        $this->renderIndex('accessaccount/accessaccount', [
+            'comptesSecondaires' => $comptesSecondaires
+        ]);
+    }
 }
 

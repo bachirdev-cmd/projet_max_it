@@ -1,0 +1,39 @@
+services:
+  Router:
+    class: App\Core\Router
+  Database:
+    class: App\Core\Database
+  Validator:
+    class: App\Core\Validator
+  Session:
+    class: App\Core\Session
+  CompteController:
+    class: App\Controller\CompteController
+  SecurityController:
+    class: App\Controller\SecurityController
+  TransactionController:
+    class: App\Controller\TransactionController
+  SecurityService:
+    class: App\Service\SecurityService
+  UserService:
+    class: App\Service\UserService
+  CompteService:
+    class: App\Service\CompteService
+  TransactionService:
+    class: App\Service\TransactionService
+  UserRepository:
+    class: App\Repository\UserRepository
+  CompteRepository:
+    class: App\Repository\CompteRepository
+  TransactionRepository:
+    class: App\Repository\TransactionRepository
+    # class: App\Service\TransactionService
+  
+  # UserRepository:
+  #   class: App\Repository\UserRepository
+  
+  # CompteRepository:
+  #   class: App\Repository\CompteRepository
+  
+  # TransactionRepository:
+  #   class: App\Repository\TransactionRepository

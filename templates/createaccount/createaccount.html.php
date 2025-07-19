@@ -1,9 +1,15 @@
+<?php
+use App\Core\Session;
+$session = Session::getInstance();
+$errors = $session->get('errors') ?? [];
+$session->unset('errors');
+?>
 <main class="flex items-center justify-center min-h-[calc(100vh-80px)] p-4">
     <div class="w-full max-w-2xl">
         <div class="border border-gray-600 rounded-lg p-8 bg-gray-900">
             <?php if (!empty($error)): ?>
                 <div class="bg-red-500 text-white px-4 py-3 rounded mb-6 text-center font-bold">
-                    <?= htmlspecialchars($error) ?>
+                    <?= $error ?>
                 </div>
             <?php endif; ?>
             <form method="POST" action="/ajout">
@@ -15,11 +21,14 @@
                     </label>
                     <input 
                         type="tel" 
-                        name="numero_tel"
+                        name="numerotel"
                         placeholder="Entrer le numero..." 
                         class="w-full p-4 bg-gray-800 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                         required
                     >
+                    <?php if (!empty($errors['numero_tel'])): ?>
+                        <div class="text-red-500 mt-2"><?= htmlspecialchars($errors['numero_tel']) ?></div>
+                    <?php endif; ?>
                 </div>
                 
                 <!-- Balance Input -->
@@ -36,6 +45,9 @@
                         class="w-full p-4 bg-gray-800 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                         required
                     >
+                    <?php if (!empty($errors['solde'])): ?>
+                        <div class="text-red-500 mt-2"><?= htmlspecialchars($errors['solde']) ?></div>
+                    <?php endif; ?>
                 </div>
                 
                 <!-- Submit Button -->
