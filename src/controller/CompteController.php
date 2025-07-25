@@ -13,36 +13,69 @@ class CompteController extends AbstractController
     public Session $session;
     private CompteService $compteService;
     private TransactionService $transactionService;
+    private Validator $validator;
 
     public function __construct(){
         $this->compteService = App::getDependency('CompteService');
         $this->transactionService = App::getDependency('TransactionService');
         $this->session = App::getDependency('Session');
+        $this->validator = App::getDependency('Validator');
     }
 
-    public function index(){
-        $userId = $this->session->get('user')['id'];
+    public function index() {
+            try {
+            $user = $this->session->get('user');
+            error_log("User dans la session: " . print_r($user, true));
 
+            if (!$user || !isset($user['id'])) {
+                error_log("Utilisateur non connecté ou ID manquant");
+                header('Location: /');
+                exit();
+            }
 
-        if(!$userId){
+            $compte = $this->compteService->getSolde($user['id']);
+            error_log("Compte récupéré: " . print_r($compte, true));
 
-        header('Location:/');
+            if (!$compte) {
+                error_log("Aucun compte trouvé pour l'utilisateur " . $user['id']);
+                // Au lieu de rediriger, on va créer un compte principal automatiquement
+                $compteService = App::getDependency('CompteService');
+                $compteData = [
+                    'numero' => 'CPT-' . uniqid(),
+                    'numerotel' => $user['login'] ?? $user['telephone'] ?? '',
+                    'solde' => 0,
+                    'typecompte' => 'principal',
+                    'userid' => $user['id']
+                ];
+                
+                if ($compteService->ajouterPrincipal($compteData)) {
+                    // Récupérer le compte nouvellement créé
+                    $compte = $compteService->getSolde($user['id']);
+                } else {
+                    // Si on ne peut toujours pas créer le compte, rediriger avec erreur
+                    $this->validator->addError('general', "Impossible de créer le compte principal");
+                    header('Location: /erreur');
+                    exit();
+                }
+            }
+
+            // Récupérer les transactions
+            $transactions = $this->transactionService->getLast10TransactionsByUserId($user['id']);
+            error_log("Transactions récupérées: " . print_r($transactions, true));
+
+            // Définir le layout et rendre la vue
+            $this->communLayout = 'baseLayout';
+            $this->renderIndex('comptes/accueil', [
+                'compte' => $compte,
+                'transactions' => $transactions,
+                'user' => $user
+            ]);
+
+        } catch (\Exception $e) {
+            error_log("Erreur dans CompteController::index: " . $e->getMessage());
+            header('Location: /erreur');
+            exit();
         }
-
-        $compte = $this->compteService->getSolde($userId);
-
-
-        if ($compte) {
-
-            $this->session->set('compte', $compte);
-
-            // Récupérer les 10 dernières transactions
-            $transactions = $this->transactionService->getLast10TransactionsByUserId($userId);
-            $this->session->set('transactions', $transactions);
-
-            $this->renderIndex('comptes/accueil');
-        }
-
     }
 
     public function show(){}

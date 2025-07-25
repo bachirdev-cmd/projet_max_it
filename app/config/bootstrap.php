@@ -8,6 +8,6 @@ require_once __DIR__ . '/env.php';
 
 use App\Core\Router;
 
-require_once '../routes/route.web.php';
+$routes = require_once __DIR__ . '/../../routes/route.web.php';
 Router::resolver($routes);
-Router::resolver($routes);
+// Router::resolver($routes);

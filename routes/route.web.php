@@ -21,7 +21,7 @@ return $routes=[
     '/accueil'=>[
         'controller' => CompteController::class,
         'action' => 'index',
-        'middleware' => 'auth'
+        // 'middleware' => 'auth'
     ],
     '/erreur'=>[
         'controller' => ErreurController::Class,
@@ -48,6 +48,21 @@ return $routes=[
         'controller' => SecurityController::class,
         'action' => 'accessaccount'
     ],
-    
+     '/inscription'=> [
+        'controller' => SecurityController::class,
+        'action' => 'inscription'
+     ],
+    '/register' => [
+    'controller' => SecurityController::class,
+    'action' => 'register'
+    ],
+    '/verify-cni' => [
+        'controller' => SecurityController::class,
+        'action' => 'verifyCni'
+    ],
+    '/clear-cni-session' => [
+        'controller' => SecurityController::class,
+        'action' => 'clearCniSession'
+    ],
 
 ];

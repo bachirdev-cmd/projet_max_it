@@ -27,7 +27,8 @@ services:
     class: App\Repository\CompteRepository
   TransactionRepository:
     class: App\Repository\TransactionRepository
-    # class: App\Service\TransactionService
+  CniApiService:
+    class: App\Service\CniApiService
   
   # UserRepository:
   #   class: App\Repository\UserRepository

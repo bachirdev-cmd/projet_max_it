@@ -1,0 +1,710 @@
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <time.h>
+
+
+
+#define MAX_UTILISATEURS 100
+#define MAX_COURS 50
+#define MAX_STRING 50
+#define MAX_DESCRIPTION 200
+#define TAUX_REUSSITE 70.0
+#define POURCENTAGE_PROF 0.7
+#define POURCENTAGE_PLATEFORME 0.3
+
+
+typedef struct {
+    int jour;
+    int mois;
+    int annee;
+} Date;
+
+
+typedef struct {
+    char question[200];
+    char reponses[4][100];
+    int reponse_correcte;
+} Question;
+
+typedef struct {
+    int id;
+    char titre[MAX_STRING];
+    Question questions[10];
+    int nb_questions;
+    float score_minimum;
+} Quiz;
+
+
+typedef struct {
+    int id;
+    char titre[MAX_STRING];
+    int id_cours;
+    int id_etudiant;
+    float score;
+    Date date_obtention;
+    bool est_reussi;
+} Certification;
+
+
+typedef struct {
+    int id;
+    char titre[MAX_STRING];
+    char description[MAX_DESCRIPTION];
+    float prix;
+    int id_professeur;
+    Quiz quiz;
+    bool a_certification;
+} Cours;
+
+
+typedef struct {
+    int id;
+    char nom[MAX_STRING];
+    char prenom[MAX_STRING];
+    char email[MAX_STRING];
+    char mdp[MAX_STRING];
+    float credits;
+    int cours_inscrits[MAX_COURS];
+    int nb_cours_inscrits;
+    Certification certifications[MAX_COURS];
+    int nb_certifications;
+} Etudiant;
+
+
+typedef struct {
+    int id;
+    char nom[MAX_STRING];
+    char prenom[MAX_STRING];
+    char email[MAX_STRING];
+    char mdp[MAX_STRING];
+    float solde;
+    int cours_crees[MAX_COURS];
+    int nb_cours_crees;
+} Professeur;
+
+
+typedef struct {
+    int id;
+    char nom[MAX_STRING];
+    char mdp[MAX_STRING];
+} Administrateur;
+
+
+Etudiant etudiants[MAX_UTILISATEURS];
+Professeur professeurs[MAX_UTILISATEURS];
+Administrateur admin = {1, "admin", "admin123"};
+Cours cours[MAX_COURS];
+
+int nb_etudiants = 0;
+int nb_professeurs = 0;
+int nb_cours = 0;
+
+bool est_email_valide(const char *email) {
+    return (strchr(email, '@') != NULL && strchr(email, '.') != NULL);
+}
+
+bool est_mdp_valide(const char *mdp) {
+    return (strlen(mdp) >= 6 && strlen(mdp) < MAX_STRING);
+}
+
+
+void inscrire_etudiant() {
+    FILE *f= fopen("Etudiants.txt", "ab");
+    if (nb_etudiants >= MAX_UTILISATEURS) {
+        printf("Nombre maximum d'étudiants atteint.\n");
+        return;
+    }
+
+    Etudiant nouvel_etudiant;
+    nouvel_etudiant.id = nb_etudiants + 1;
+    nouvel_etudiant.credits = 0;
+    nouvel_etudiant.nb_cours_inscrits = 0;
+    nouvel_etudiant.nb_certifications = 0;
+
+    printf("\n============== INSCRIPTION ÉTUDIANT ======================\n");
+    printf("Nom : ");
+    scanf("%s", nouvel_etudiant.nom);
+    printf("Prénom : ");
+    scanf("%s", nouvel_etudiant.prenom);
+    do {
+        printf("Votre Email : ");
+        scanf("%s" , nouvel_etudiant.email);
+    } while (!est_email_valide(nouvel_etudiant.email));
+
+    do {
+       printf("Mot de passe (min 6 caractères) : ");
+       scanf("%s",nouvel_etudiant.mdp);
+    } while (!est_mdp_valide(nouvel_etudiant.mdp));
+
+
+    etudiants[nb_etudiants++] = nouvel_etudiant;
+    fwrite(&nouvel_etudiant , sizeof(nouvel_etudiant) , 1 , f);
+    printf("Inscription réussie!\n");
+    fclose(f);
+}
+
+void inscrire_professeur() {
+FILE *f1 = fopen("Professeurs.txt" , "ab");
+int email;
+    if (nb_professeurs >= MAX_UTILISATEURS) {
+
+        printf("Nombre maximum de professeurs atteint.\n");
+        return;
+    }
+
+
+Professeur nouveau_prof;
+nouveau_prof.id = nb_professeurs + 1;
+nouveau_prof.solde = 0;
+nouveau_prof.nb_cours_crees = 0;
+
+printf("\n\n=========== INSCRIPTION PROFESSEUR ===========\n");
+printf("Nom : ");
+scanf("%s", nouveau_prof.nom);
+printf("Prénom : ");
+scanf("%s", nouveau_prof.prenom);
+
+ do {
+        printf("Votre Email : ");
+        scanf("%s" , nouveau_prof.email);
+    } while (!est_email_valide(nouveau_prof.email));
+do {
+    printf("Mot de passe (min 6 caractères) : ");
+    scanf("%s", nouveau_prof.mdp);
+} while (!est_mdp_valide(nouveau_prof.mdp));
+
+professeurs[nb_professeurs++] = nouveau_prof;
+
+fseek(f1, 0, SEEK_END);
+if (fwrite(&nouveau_prof, sizeof(nouveau_prof), 1, f1)) {
+    printf("\n\n INSCRIPTION REUSSIE!\n\n");
+}
+
+fclose(f1);
+}
+
+int connexion(char email[], char mdp[], int type) {
+    if (type == 1) {
+    Etudiant e ;
+        FILE *f= fopen("Etudiants.txt" , "rb");
+        while(fread(&e , sizeof(e) , 1 , f)){
+
+            if (strcmp(email, e.email) == 0 &&
+                strcmp(mdp, e.mdp) == 0) {
+                fclose(f);
+                return 1;
+
+            }
+
+        }
+     fclose(f);
+
+    } else if (type == 2) {
+Professeur p ;
+        FILE *f= fopen("Professeurs.txt" , "rb");
+        while(fread(&p , sizeof(p) , 1 , f)){
+
+            if (strcmp(email, p.email) == 0 &&
+                strcmp(mdp, p.mdp) == 0) {
+                fclose(f);
+                return 1;
+            }
+
+        }
+     fclose(f);
+
+
+
+    } else if (type == 3) {
+        if (strcmp(email, admin.nom) == 0 && strcmp(mdp, admin.mdp) == 0) {
+            return 1;
+        }
+    }
+    return -1;
+}
+
+
+void acheter_credits(int id_etudiant) {
+    float montant=0.0;
+    FILE *c =fopen("Credit.txt" , "ab");
+    printf("\n======================== ACHAT DE CRÉDITS ======================\n");
+
+    printf("Montant à ajouter : ");
+    scanf("%f", &montant);
+
+    if (montant > 0) {
+        etudiants[id_etudiant].credits += montant;
+        printf("Achat réussi! \n\n Nouveau solde : %.2f crédits\n\n ",
+               etudiants[id_etudiant].credits);
+               fwrite(&montant , sizeof(montant) , 1 , c);
+               fwrite(&id_etudiant, sizeof(id_etudiant) , 1 , c);
+               fclose(c);
+    } else {
+        printf("\n Montant invalide.\n");fclose(c);
+    }
+}
+
+
+void inscrire_cours(int id_etudiant) {
+Cours c;
+   FILE *f=fopen("cours.txt" , "ab");
+    printf("\n \n =========== INSCRIPTION À UN COUR ==============\n");
+    printf("Cours disponibles :\n");
+
+    while(fread(&c ,sizeof(c), 1 , f)) {
+        printf("%d. %s - Prix: %.2f crédits\n\n",
+               c.id,
+               c.titre,
+               c.prix);
+    }
+
+    int id_cours;
+    printf("\n\n Entrez l'ID du cours souhaité : ");
+    scanf("%d", &id_cours);
+
+   int i;
+    int index_cours = -1;
+   while(fread(&c , sizeof(c), 1 , f)) {
+        if (c.id == id_cours) {
+            index_cours = i;
+            break;
+        }
+    }
+
+    if (index_cours == -1) {
+        printf("\n \n Cours non trouvé.\n");
+        return;
+    }
+
+
+    if (etudiants[id_etudiant].credits < cours[index_cours].prix) {
+        printf("\n \n Crédits insuffisants.\n");
+        return;
+    }
+
+
+    etudiants[id_etudiant].cours_inscrits[etudiants[id_etudiant].nb_cours_inscrits] = id_cours;
+    etudiants[id_etudiant].nb_cours_inscrits++;
+    etudiants[id_etudiant].credits -= cours[index_cours].prix;
+
+
+    float revenu_prof = cours[index_cours].prix * POURCENTAGE_PROF;
+    professeurs[cours[index_cours].id_professeur].solde += revenu_prof;
+
+    printf("\n \n Inscription réussie au cours '%s'!\n", cours[index_cours].titre);
+}
+
+void passer_certification(int id_etudiant) {
+    printf("\n\n ============ PASSER UNE CERTIFICATION ==============\n");
+    printf("\n Vos cours avec certification disponible :\n");
+
+    bool cours_dispo = false;
+    for (int i = 0; i < etudiants[id_etudiant].nb_cours_inscrits; i++) {
+        int id_cours = etudiants[id_etudiant].cours_inscrits[i];
+        if (cours[id_cours].a_certification) {
+            printf("%d. %s\n", id_cours, cours[id_cours].titre);
+            cours_dispo = true;
+        }
+    }
+
+    if (!cours_dispo) {
+        printf("\n \n Aucun cours avec certification disponible.\n");
+        return;
+    }
+
+    int id_cours;
+    printf("\n\n Choisissez le cours (ID) : ");
+    scanf("%d", &id_cours);
+
+
+    bool inscrit = false;
+    for (int i = 0; i < etudiants[id_etudiant].nb_cours_inscrits; i++) {
+        if (etudiants[id_etudiant].cours_inscrits[i] == id_cours) {
+            inscrit = true;
+            break;
+        }
+    }
+
+    if (!inscrit) {
+        printf("\n \n Vous n'êtes pas inscrit à ce cours.\n");
+        return;
+    }
+
+    Quiz quiz = cours[id_cours].quiz;
+    int bonnes_reponses = 0;
+
+    printf("\n\n \n Début du quiz : %s\n", quiz.titre);
+    for (int i = 0; i < quiz.nb_questions; i++) {
+        printf("\nQuestion %d: %s\n", i + 1, quiz.questions[i].question);
+        for (int j = 0; j < 4; j++) {
+            printf("%d. %s\n", j + 1, quiz.questions[i].reponses[j]);
+        }
+
+        int reponse;
+        printf("\n Votre réponse (1-4) : ");
+        scanf("%d", &reponse);
+        reponse--;
+
+        if (reponse == quiz.questions[i].reponse_correcte) {
+            bonnes_reponses++;
+        }
+    }
+
+    float score = (float)bonnes_reponses / quiz.nb_questions * 100;
+
+
+    Certification certif;
+    certif.id = etudiants[id_etudiant].nb_certifications + 1;
+    strcpy(certif.titre, cours[id_cours].titre);
+    certif.id_cours = id_cours;
+    certif.id_etudiant = id_etudiant;
+    certif.score = score;
+
+
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    certif.date_obtention.jour = tm.tm_mday;
+    certif.date_obtention.mois = tm.tm_mon + 1;
+    certif.date_obtention.annee = tm.tm_year + 1900;
+
+    certif.est_reussi = (score >= TAUX_REUSSITE);
+
+    printf("\n\n Résultat : %.2f%%\n", score);
+    if (certif.est_reussi) {
+        printf("\n Félicitations ! Vous avez obtenu la certification.\n");
+        etudiants[id_etudiant].certifications[etudiants[id_etudiant].nb_certifications++] = certif;
+    } else {
+        printf("\n Vous n'avez pas obtenu le score minimum requis (%.0f%%).\n", TAUX_REUSSITE);
+    }
+}
+
+void voir_certifications(int id_etudiant) {
+    printf("\n\n ============= MES CERTIFICATIONS ===============\n");
+
+    if (etudiants[id_etudiant].nb_certifications == 0) {
+        printf("\n Vous n'avez pas encore de certification.\n");
+        return;
+    }
+
+    for (int i = 0; i < etudiants[id_etudiant].nb_certifications; i++) {
+        Certification certif = etudiants[id_etudiant].certifications[i];
+        printf("\nCertification #%d\n", certif.id);
+        printf("Cours : %s\n", certif.titre);
+        printf("Date d'obtention : %02d/%02d/%d\n",
+               certif.date_obtention.jour,
+               certif.date_obtention.mois,
+               certif.date_obtention.annee);
+        printf("Score : %.2f%%\n", certif.score);
+        printf("Statut : %s\n", certif.est_reussi ? "RÉUSSI" : "ÉCHOUÉ");
+    }
+}
+
+void imprimer_certification(int id_etudiant) {
+    voir_certifications(id_etudiant);
+
+    if (etudiants[id_etudiant].nb_certifications == 0) {
+        return;
+    }
+
+    int id_certification;
+    printf("\n \n Entrez l'ID de la certification à imprimer : ");
+    scanf("%d", &id_certification);
+
+    bool trouve = false;
+    Certification certif;
+
+    for (int i = 0; i < etudiants[id_etudiant].nb_certifications; i++) {
+        if (etudiants[id_etudiant].certifications[i].id == id_certification) {
+            certif = etudiants[id_etudiant].certifications[i];
+            trouve = true;
+            break;
+        }
+    }
+
+    if (!trouve) {
+        printf("\n Certification non trouvée.\n");
+        return;
+    }
+
+    if (!certif.est_reussi) {
+        printf("\n Cette certification n'a pas été réussie.\n");
+        return;
+    }
+
+    printf("\n\n ================================================\n");
+    printf("            CERTIFICAT DE RÉUSSITE\n");
+    printf("================================================\n\n");
+    printf("Ce certificat atteste que\n\n");
+    printf("%s %s\n\n",
+           etudiants[id_etudiant].prenom,
+           etudiants[id_etudiant].nom);
+    printf("a complété avec succès le cours\n\n");
+    printf("%s\n\n", certif.titre);
+    printf("avec un score de %.2f%%\n\n", certif.score);
+    printf("Date d'obtention : %02d/%02d/%d\n",
+           certif.date_obtention.jour,
+           certif.date_obtention.mois,
+           certif.date_obtention.annee);
+    printf("\n================================================\n");
+}
+
+void creer_cours(int id_professeur) {
+    if (nb_cours >= MAX_COURS) {
+        printf("\n Nombre maximum de cours atteint.\n");
+        return;
+    }
+
+    Cours nouveau_cours;
+    nouveau_cours.id = nb_cours;
+    nouveau_cours.id_professeur = id_professeur;
+    nouveau_cours.a_certification = false;
+
+    printf("\n=========== CRÉATION D'UN COURS =============\n");
+    printf("Titre : ");
+    scanf(" %[^\n]s", nouveau_cours.titre);
+    printf("Description : ");
+    scanf(" %[^\n]s", nouveau_cours.description);
+    printf("Prix (en crédits) : ");
+    scanf("%f", &nouveau_cours.prix);
+
+    cours[nb_cours] = nouveau_cours;
+    professeurs[id_professeur].cours_crees[professeurs[id_professeur].nb_cours_crees++] = nb_cours;
+    nb_cours++;
+
+    printf("Cours créé avec succès!\n");
+}
+
+void voir_solde(int id_professeur) {
+    printf("\n============ SOLDE ACTUEL ===============\n");
+    printf("\n Votre solde est de : %.2f crédits\n", professeurs[id_professeur].solde);
+}
+
+void creer_certification(int id_professeur) {
+    printf("\n========== CRÉATION D'UNE CERTIFICATION ==========\n");
+
+    printf("Vos cours :\n");
+    for (int i = 0; i < professeurs[id_professeur].nb_cours_crees; i++) {
+        int id_cours = professeurs[id_professeur].cours_crees[i];
+        printf("%d. %s\n", cours[id_cours].id, cours[id_cours].titre);
+    }
+
+    int id_cours;
+    printf("Choisissez le cours pour la certification (ID) : ");
+    scanf("%d", &id_cours);
+
+    bool cours_trouve = false;
+    for (int i = 0; i < professeurs[id_professeur].nb_cours_crees; i++) {
+        if (professeurs[id_professeur].cours_crees[i] == id_cours) {
+            cours_trouve = true;
+            break;
+        }
+    }
+
+    if (!cours_trouve) {
+        printf("Cours non trouvé ou vous n'êtes pas l'auteur.\n");
+        return;
+    }
+
+    Quiz quiz;
+    quiz.id = id_cours;
+    printf("Titre du quiz : ");
+    scanf(" %[^\n]s", quiz.titre);
+
+    printf("Nombre de questions (max 10) : ");
+    scanf("%d", &quiz.nb_questions);
+    if (quiz.nb_questions > 10) quiz.nb_questions = 10;
+
+    for (int i = 0; i < quiz.nb_questions; i++) {
+        printf("\nQuestion %d :\n", i + 1);
+        printf("Énoncé : ");
+        scanf(" %[^\n]s", quiz.questions[i].question);
+
+        for (int j = 0; j < 4; j++) {
+            printf("Réponse %d : ", j + 1);
+            scanf(" %[^\n]s", quiz.questions[i].reponses[j]);
+        }
+
+        printf("Numéro de la réponse correcte (1-4) : ");
+        scanf("%d", &quiz.questions[i].reponse_correcte);
+        quiz.questions[i].reponse_correcte--;
+    }
+
+    quiz.score_minimum = TAUX_REUSSITE;
+    cours[id_cours].quiz = quiz;
+    cours[id_cours].a_certification = true;
+
+    printf("Certification créée avec succès!\n");
+}
+
+void gerer_utilisateurs() {
+    printf("\n=========== GESTION DES UTILISATEURS ============\n");
+    printf("1. Liste des étudiants\n");
+    printf("2. Liste des professeurs\n");
+    printf("3. Retour\n");
+
+    int choix;
+    printf("Choix : ");
+    scanf("%d", &choix);
+
+    switch (choix) {
+        case 1:
+            printf("\nListe des étudiants :\n");
+            for (int i = 0; i < nb_etudiants; i++) {
+                printf("ID: %d - %s %s (%s)\n",
+                       etudiants[i].id,
+                       etudiants[i].prenom,
+                       etudiants[i].nom,
+                       etudiants[i].email);
+            }
+            break;
+
+        case 2:
+            printf("\nListe des professeurs :\n");
+            for (int i = 0; i < nb_professeurs; i++) {
+                printf("ID: %d - %s %s (%s)\n",
+                       professeurs[i].id,
+                       professeurs[i].prenom,
+                       professeurs[i].nom,
+                       professeurs[i].email);
+            }
+            break;
+    }
+}
+
+void interface_etudiant(int id_etudiant) {
+    int choix;
+    do {
+        printf("\n=============== ESPACE ÉTUDIANT ==============\n");
+        printf("1. Acheter des crédits\n");
+        printf("2. S'inscrire à un cours\n");
+        printf("3. Passer une certification\n");
+        printf("4. Voir mes certifications\n");
+        printf("5. Imprimer une certification\n");
+        printf("6. Déconnexion\n");
+        printf("Choix : ");
+        scanf("%d", &choix);
+
+        switch (choix) {
+            case 1:
+                acheter_credits(id_etudiant);
+                break;
+            case 2:
+                inscrire_cours(id_etudiant);
+                break;
+            case 3:
+                passer_certification(id_etudiant);
+                break;
+            case 4:
+                voir_certifications(id_etudiant);
+                break;
+            case 5:
+                imprimer_certification(id_etudiant);
+                break;
+        }
+    } while (choix != 6);
+}
+
+void interface_professeur(int id_professeur) {
+    int choix;
+    do {
+        printf("\n============= ESPACE PROFESSEUR ==============\n");
+        printf("1. Créer un cours\n");
+        printf("2. Créer une certification\n");
+        printf("3. Voir mon solde\n");
+        printf("4. Déconnexion\n");
+        printf("\n  \n Choix : ");
+        scanf("%d", &choix);
+
+        switch (choix) {
+            case 1:
+                creer_cours(id_professeur);
+                break;
+            case 2:
+                creer_certification(id_professeur);
+                break;
+            case 3:
+                voir_solde(id_professeur);
+                break;
+        }
+    } while (choix != 4);
+}
+
+void interface_admin() {
+    int choix;
+    do {
+        printf("\n============ ESPACE ADMINISTRATEUR ==============\n");
+        printf("1. Gérer les utilisateurs\n");
+        printf("2. Déconnexion\n");
+        printf("\n \n Choix : ");
+        scanf("%d", &choix);
+
+        if (choix == 1) {
+            gerer_utilisateurs();
+        }
+    } while (choix != 2);
+}
+
+void afficher_accueil() {
+    printf("\n=========== PLATEFORME DE FORMATION EN LIGNE =============\n");
+    printf("1. Connexion\n");
+    printf("2. Inscription étudiant\n");
+    printf("3. Inscription professeur\n");
+    printf("4. Quitter\n");
+}
+
+int main() {
+    int choix;
+    char email[50], mdp[50];
+
+    while (1) {
+        afficher_accueil();
+        printf("Choix : ");
+        scanf("%d", &choix);
+
+        switch (choix) {
+            case 1:
+                printf("Etes vous  (1: Étudiant, 2: Professeur, 3: Admin) : ");
+                int type;
+                scanf("%d", &type);
+
+                printf("Email : ");
+                scanf("%s", email);
+                printf("Mot de passe : ");
+                scanf("%s", mdp);
+
+                int id = connexion(email, mdp, type);
+                if (id != -1) {
+                    switch (type) {
+                        case 1:
+                            interface_etudiant(id);
+                            break;
+                        case 2:
+                            interface_professeur(id);
+                            break;
+                        case 3:
+                            interface_admin();
+                            break;
+                } }else {
+                    printf("Identifiants incorrects.\n");
+                }
+                break;
+
+            case 2:
+                inscrire_etudiant();
+                break;
+
+            case 3:
+                inscrire_professeur();
+                break;
+
+            case 4:
+                printf("\n \n AU REVOIR !!!!\n");
+                return 0;
+        }
+    }
+
+    return 0;
+}

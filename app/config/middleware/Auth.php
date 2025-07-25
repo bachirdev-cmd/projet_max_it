@@ -2,16 +2,16 @@
 
 namespace App\Config\Middleware;
 
+use App\Core\App;
 
-class Auth{
-
-    public function __invoke():bool{
-        $session = App::getDependancy('Session');
-
+class Auth {
+    public function __invoke(): bool {
+        $session = App::getDependency('Session');
         if (!$session->isset('user')) {
-            header('Location:/');
+            header('Location: /');
             exit();
-        }return true;
-
+        }
+        return true;
     }
 }
+

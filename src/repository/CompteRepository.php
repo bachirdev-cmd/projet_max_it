@@ -84,4 +84,23 @@ class CompteRepository {
         $stmt->execute(['userId' => $userId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    public function create(array $data): bool {
+        try {
+            $sql = "INSERT INTO compte (numero, datecreation, solde, numerotel, typecompte, userid)
+                    VALUES (:numero, :datecreation, :solde, :numerotel, :typecompte, :userid)";
+            
+            $stmt = $this->database->getPdo()->prepare($sql);
+            return $stmt->execute([
+                ':numero' => $data['numero'],
+                ':datecreation' => $data['datecreation'],
+                ':solde' => $data['solde'] ?? 0,
+                ':numerotel' => $data['numerotel'],
+                ':typecompte' => $data['typecompte'],
+                ':userid' => $data['userid']
+            ]);
+        } catch (\PDOException $e) {
+            error_log("Erreur SQL creation compte: " . $e->getMessage());
+            return false;
+        }
+    }
 }

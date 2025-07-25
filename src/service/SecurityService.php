@@ -20,11 +20,48 @@ class SecurityService {
         return self::$instance;
     }
 
+    public function register(array $userData): bool {
+        try {
+            // Ici on pourrait ajouter la logique de création du compte principal
+            $created = $this->userRepository->create($userData);
+            
+            if ($created) {
+                // Créer automatiquement un compte principal pour l'utilisateur
+                $compteService = App::getDependency('CompteService');
+                $compteData = [
+                    'numero' => 'CPT-' . uniqid(),
+                    'numerotel' => $userData['login'],
+                    'solde' => 0,
+                    'typecompte' => 'principal',
+                    'userid' => $this->userRepository->getLastInsertId()
+                ];
+                
+                return $compteService->ajouterPrincipal($compteData);
+            }
+            
+            return false;
+        } catch(\Exception $e) {
+            throw new \Exception("Erreur lors de l'inscription: " . $e->getMessage());
+        }
+    }
+
     public function login(string $login, string $password): array|false {
         try {
-            return $this->userRepository->Selectloginandpassword($login, $password);
+            error_log("Tentative de connexion pour login: $login");
+            $user = $this->userRepository->Selectloginandpassword($login, $password);
+            error_log("Résultat de la requête: " . print_r($user, true));
+            
+            if ($user) {
+                // Enlever le mot de passe avant de stocker dans la session
+                unset($user['password']);
+                error_log("Utilisateur connecté avec succès: " . $user['login']);
+                return $user;
+            }
+            error_log("Aucun utilisateur trouvé avec ces identifiants");
+            return false;
         } catch(\Exception $e) {
-            throw new \Exception("Erreur lors de la connexion: " . $e->getMessage(), 0, $e);
+            error_log("Exception dans SecurityService::login: " . $e->getMessage());
+            throw new \Exception("Erreur lors de la connexion: " . $e->getMessage());
         }
     }
 }
