@@ -11,9 +11,18 @@ services:
         value: production
       - key: APP_URL
         value: https://maxit-app.onrender.com
-    
-databases:
-  - name: maxit-db
-    databaseName: maxit_production
-    user: maxit_user
-    plan: free
+      # Variables Railway Database
+      - key: DATABASE_URL
+        value: postgresql://postgres:NvkogRfRpUphAVmRnzpiKKUSKnHTwQMw@yamabiko.proxy.rlwy.net:16680/railway
+      - key: DB_HOST
+        value: yamabiko.proxy.rlwy.net
+      - key: DB_PORT
+        value: "16680"
+      - key: DB_NAME
+        value: railway
+      - key: DB_USERNAME
+        value: postgres
+      - key: DB_PASSWORD
+        value: NvkogRfRpUphAVmRnzpiKKUSKnHTwQMw
+
+# Base de données Railway (externe) - pas besoin de section databases

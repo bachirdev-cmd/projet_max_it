@@ -18,13 +18,20 @@ try {
     require_once __DIR__ . '/app/config/database.php';
     
     // Test de connexion à la base de données
-    echo "Test de connexion à la base de données...\n";
+    echo "Test de connexion à la base de données Railway...\n";
+    echo "Host: " . ($_ENV['DB_HOST'] ?? 'N/A') . "\n";
+    echo "Port: " . ($_ENV['DB_PORT'] ?? 'N/A') . "\n";
+    echo "Database: " . ($_ENV['DB_NAME'] ?? 'N/A') . "\n";
     echo "DSN utilisé: " . $_ENV['DSN'] . "\n";
     
     $pdo = new PDO(
         $_ENV['DSN'],
         $_ENV['DB_USERNAME'],
-        $_ENV['DB_PASSWORD']
+        $_ENV['DB_PASSWORD'],
+        [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_TIMEOUT => 10
+        ]
     );
 
     echo "✓ Connexion à la base de données réussie\n";
