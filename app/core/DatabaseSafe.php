@@ -13,6 +13,10 @@ class DatabaseSafe extends Database {
             $dsn = $_ENV['DSN'] ?? null;
             $username = $_ENV['DB_USERNAME'] ?? null;
             $password = $_ENV['DB_PASSWORD'] ?? null;
+            
+            error_log("DatabaseSafe - DSN: " . ($dsn ?? 'NULL'));
+            error_log("DatabaseSafe - USERNAME: " . ($username ?? 'NULL'));
+            error_log("DatabaseSafe - DATABASE_URL: " . ($_ENV['DATABASE_URL'] ?? 'NULL'));
 
             if (!$dsn || empty($dsn) || $dsn === 'pgsql:host=;port=0;dbname=') {
                 error_log("Base de données désactivée - variables d'environnement manquantes");
@@ -29,6 +33,10 @@ class DatabaseSafe extends Database {
         } catch (\Exception $e) {
             error_log("Connexion base de données échouée: " . $e->getMessage());
             $this->connected = false;
+            // En production, on ne veut pas de fallback SQLite
+            if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'production') {
+                throw new \Exception("Database connection required in production: " . $e->getMessage());
+            }
             $this->createMockPdo();
         }
     }

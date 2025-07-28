@@ -41,7 +41,7 @@ ALTER TABLE compte ADD COLUMN IF NOT EXISTS numero VARCHAR(50);
 UPDATE compte SET numero = 'CPT-' || id WHERE numero IS NULL;
 
 -- 3. Ajouter la contrainte NOT NULL
-DO $$
+DO $$ 
 BEGIN
     IF EXISTS (
         SELECT 1 FROM information_schema.columns 
