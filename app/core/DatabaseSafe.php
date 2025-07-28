@@ -5,6 +5,7 @@ use PDO;
 
 class DatabaseSafe extends Database {
     private bool $connected = false;
+    protected PDO $pdo;
 
     public function __construct()
     {

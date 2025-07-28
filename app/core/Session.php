@@ -9,7 +9,11 @@ private static ?Session $session = null;
     public function __construct()
     {
         if (session_status() === PHP_SESSION_NONE) {
-            session_start();
+            if (!headers_sent()) {
+                session_start();
+            } else {
+                error_log('Session cannot be started - headers already sent');
+            }
         }
     }
 

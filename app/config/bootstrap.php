@@ -1,4 +1,10 @@
 <?php
+// Start output buffering and session early
+ob_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 // Chargement optionnel du .env (uniquement en local)
