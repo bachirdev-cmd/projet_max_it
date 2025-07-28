@@ -9,8 +9,9 @@ services:
     envVars:
       - key: APP_ENV
         value: production
-      - key: APP_URL
-        value: https://maxit-app.onrender.com
+      # APP_URL sera ajouté après le déploiement
+      # - key: APP_URL
+      #   value: https://votre-url-render.onrender.com
       # Variables Railway Database
       - key: DATABASE_URL
         value: postgresql://postgres:NvkogRfRpUphAVmRnzpiKKUSKnHTwQMw@yamabiko.proxy.rlwy.net:16680/railway
