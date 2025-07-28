@@ -1,14 +1,11 @@
 <?php
 
-if (!isset($_ENV['APP_URL'])) {
-    throw new \RuntimeException('Le fichier .env n\'est pas chargé correctement');
-}
-
-define('App_URL', $_ENV['APP_URL']);
-define('host', $_ENV['DB_HOST']);
-define('dbname', $_ENV['DB_NAME']);
-define('DB_USERNAME', $_ENV['DB_USERNAME']);
-define('DB_PASSWORD', $_ENV['DB_PASSWORD']);
+// Configuration des constantes avec valeurs par défaut
+define('App_URL', $_ENV['APP_URL'] ?? 'http://localhost:8000');
+define('host', $_ENV['DB_HOST'] ?? 'localhost');
+define('dbname', $_ENV['DB_NAME'] ?? 'maxitgroupe');
+define('DB_USERNAME', $_ENV['DB_USERNAME'] ?? 'postgres');
+define('DB_PASSWORD', $_ENV['DB_PASSWORD'] ?? '');
 
 
 
