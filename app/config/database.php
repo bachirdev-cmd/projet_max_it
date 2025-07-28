@@ -4,8 +4,8 @@
  * Configuration de base de données adaptée pour Render
  */
 
-// Debug: Afficher les variables disponibles
-error_log("Variables disponibles: " . print_r($_ENV, true));
+// Debug: Variables d'environnement (commenté en production)
+// error_log("Variables disponibles: " . print_r($_ENV, true));
 
 // Priorité à DATABASE_URL (format Render) si disponible
 $databaseUrl = $_ENV['DATABASE_URL'] ?? getenv('DATABASE_URL') ?? null;
@@ -47,6 +47,7 @@ if ($databaseUrl && !empty($databaseUrl)) {
     );
 }
 
-error_log("Configuration finale - DSN: " . $_ENV['DSN']);
-error_log("DB_USERNAME: " . $_ENV['DB_USERNAME']);
-error_log("DB_HOST: " . $_ENV['DB_HOST']);
+// Logs de debug désactivés en production
+// error_log("Configuration finale - DSN: " . $_ENV['DSN']);
+// error_log("DB_USERNAME: " . $_ENV['DB_USERNAME']);
+// error_log("DB_HOST: " . $_ENV['DB_HOST']);
