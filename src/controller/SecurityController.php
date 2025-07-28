@@ -185,9 +185,8 @@ class SecurityController extends AbstractController
             // Appel à l'API CNI
             $cniApiService = App::getDependency('CniApiService');
             
-            // Activer le mode simulation si l'API externe ne fonctionne pas
-            // TODO: Désactiver en production
-            $cniApiService->enableMockMode();
+            // Mode simulation désactivé en production
+            // $cniApiService->enableMockMode();
             
             $cniData = $cniApiService->verifyCni($cni);
 

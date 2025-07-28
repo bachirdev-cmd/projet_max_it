@@ -6,7 +6,6 @@ if (!class_exists(\Symfony\Component\Yaml\Yaml::class)) {
 }
 
 require_once __DIR__ . '/../app/config/bootstrap.php';
-require_once '../app/config/bootstrap.php';
 
 
 

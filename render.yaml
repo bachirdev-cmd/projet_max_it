@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: maxit-app
+    env: php
+    buildCommand: |
+      composer install --no-dev --optimize-autoloader
+      php setup-production.php
+    startCommand: php -S 0.0.0.0:$PORT -t public/
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_URL
+        value: https://maxit-app.onrender.com
+    
+databases:
+  - name: maxit-db
+    databaseName: maxit_production
+    user: maxit_user
+    plan: free

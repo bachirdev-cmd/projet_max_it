@@ -3,7 +3,7 @@
 namespace App\Service;
 
 class CniApiService {
-    private const API_BASE_URL = 'https://projet-app-daff.onrender.com';
+    private const API_BASE_URL = 'https://app-daff-project.onrender.com';
     private static ?CniApiService $instance = null;
     private bool $mockMode = false;
 
@@ -122,11 +122,25 @@ class CniApiService {
             }
 
             // Décodage de la réponse JSON
-            $data = json_decode($response, true);
+            $responseData = json_decode($response, true);
             
             if (json_last_error() !== JSON_ERROR_NONE) {
                 error_log("Erreur de décodage JSON: " . json_last_error_msg());
                 error_log("Réponse complète: $response");
+                return false;
+            }
+
+            // Vérifier la structure de réponse de votre API
+            if (isset($responseData['status']) && $responseData['status'] === 'ERROR') {
+                error_log("CNI non trouvée selon l'API: " . ($responseData['message'] ?? 'Erreur inconnue'));
+                return false;
+            }
+
+            // Extraire les données du citoyen
+            $data = $responseData['data'] ?? $responseData;
+            
+            if (!$data || !isset($data['cni'])) {
+                error_log("Données CNI manquantes dans la réponse");
                 return false;
             }
 
