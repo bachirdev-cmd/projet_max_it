@@ -10,6 +10,9 @@
 // Priorité à DATABASE_URL (format Render) si disponible
 $databaseUrl = $_ENV['DATABASE_URL'] ?? getenv('DATABASE_URL') ?? null;
 
+error_log("DATABASE_URL récupérée: " . ($databaseUrl ?? 'NULL'));
+error_log("Variables _ENV disponibles: " . print_r(array_keys($_ENV), true));
+
 if ($databaseUrl && !empty($databaseUrl)) {
     // Format Render : postgres://user:password@host:port/dbname
     error_log("Utilisation de DATABASE_URL: $databaseUrl");

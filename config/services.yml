@@ -2,7 +2,7 @@ services:
   Router:
     class: App\Core\Router
   Database:
-    class: App\Core\Database
+    class: App\Core\DatabaseSafe
   Validator:
     class: App\Core\Validator
   Session:
