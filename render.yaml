@@ -11,18 +11,8 @@ services:
         value: production
       - key: APP_URL
         value: https://projet-max-it.onrender.com
-      # Variables Railway Database
+      # Variables Railway Database (seule DATABASE_URL nécessaire)
       - key: DATABASE_URL
-        value: postgresql://postgres:NvkogRfRpUphAVmRnzpiKKUSKnHTwQMw@yamabiko.proxy.rlwy.net:16680/railway
-      - key: DB_HOST
-        value: yamabiko.proxy.rlwy.net
-      - key: DB_PORT
-        value: "16680"
-      - key: DB_NAME
-        value: railway
-      - key: DB_USERNAME
-        value: postgres
-      - key: DB_PASSWORD
-        value: NvkogRfRpUphAVmRnzpiKKUSKnHTwQMw
+      value: postgresql://postgres:NvkogRfRpUphAVmRnzpiKKUSKnHTwQMw@yamabiko.proxy.rlwy.net:16680/railway
 
 # Base de données Railway (externe) - pas besoin de section databases

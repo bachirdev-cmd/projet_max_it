@@ -22,9 +22,14 @@ if ($databaseUrl && !empty($databaseUrl)) {
     
     $_ENV['DB_HOST'] = $parsed['host'];
     $_ENV['DB_PORT'] = $parsed['port'] ?? 5432;
-    $_ENV['DB_NAME'] = ltrim($parsed['path'], '/');
+    $dbName = ltrim($parsed['path'], '/');
+    $_ENV['DB_NAME'] = $dbName;
     $_ENV['DB_USERNAME'] = $parsed['user'];
     $_ENV['DB_PASSWORD'] = $parsed['pass'];
+    
+    // Debug pour voir ce qui se passe
+    error_log("Parsed DB_NAME from URL: '$dbName'");
+    error_log("Final DB_NAME: " . $_ENV['DB_NAME']);
     
     // Reconstruction du DSN
     $_ENV['DSN'] = sprintf(
