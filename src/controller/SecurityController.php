@@ -242,6 +242,55 @@ class SecurityController extends AbstractController
         exit();
     }
 
+    public function setupDatabase() {
+        header('Content-Type: application/json');
+        
+        try {
+            $db = App::getDependency('Database');
+            $pdo = $db->getPdo();
+            
+            // Lire le fichier de migration
+            $migrationFile = __DIR__ . '/../../migrations/script.sql';
+            if (!file_exists($migrationFile)) {
+                echo json_encode(['success' => false, 'message' => 'Fichier de migration non trouvé']);
+                exit();
+            }
+            
+            $sql = file_get_contents($migrationFile);
+            
+            // Exécuter les requêtes
+            $statements = array_filter(array_map('trim', explode(';', $sql)));
+            $success = 0;
+            $errors = [];
+            
+            foreach ($statements as $statement) {
+                if (empty($statement) || preg_match('/^\s*--/', $statement)) {
+                    continue;
+                }
+                
+                try {
+                    $pdo->exec($statement);
+                    $success++;
+                } catch (\Exception $e) {
+                    $errors[] = substr($statement, 0, 50) . '...';
+                }
+            }
+            
+            echo json_encode([
+                'success' => true, 
+                'message' => "Tables créées ! ($success requêtes exécutées)",
+                'details' => [
+                    'success' => $success,
+                    'errors' => count($errors)
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erreur: ' . $e->getMessage()]);
+        }
+        exit();
+    }
+
     public function register() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Nettoyer les erreurs précédentes

@@ -64,5 +64,9 @@ return $routes=[
         'controller' => SecurityController::class,
         'action' => 'clearCniSession'
     ],
+    '/setup-database' => [
+        'controller' => SecurityController::class,
+        'action' => 'setupDatabase'
+    ],
 
 ];
