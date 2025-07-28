@@ -51,6 +51,22 @@
                 </div>
             <?php endif; ?>
 
+            <!-- Zone d'erreur dynamique (remplace les alerts JS) -->
+            <div id="error-message" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 hidden">
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    <span id="error-text"></span>
+                </div>
+            </div>
+
+            <!-- Zone de succès dynamique -->
+            <div id="success-message" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 hidden">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <span id="success-text"></span>
+                </div>
+            </div>
+
             <!-- ÉTAPE 1: Formulaire initial (CNI + téléphone + adresse) -->
             <div id="step1" <?= $cniData ? 'style="display:none;"' : '' ?>>
                 <form id="cni-form" class="space-y-6">
@@ -259,26 +275,59 @@
             const step1 = document.getElementById('step1');
             const step2 = document.getElementById('step2');
             const restartBtn = document.getElementById('restart-btn');
+            
+            // Fonctions pour afficher les messages
+            function showError(message) {
+                const errorDiv = document.getElementById('error-message');
+                const errorText = document.getElementById('error-text');
+                const successDiv = document.getElementById('success-message');
+                
+                successDiv.classList.add('hidden');
+                errorText.textContent = message;
+                errorDiv.classList.remove('hidden');
+                
+                // Scroll vers le message
+                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+            function showSuccess(message) {
+                const successDiv = document.getElementById('success-message');
+                const successText = document.getElementById('success-text');
+                const errorDiv = document.getElementById('error-message');
+                
+                errorDiv.classList.add('hidden');
+                successText.textContent = message;
+                successDiv.classList.remove('hidden');
+                
+                // Scroll vers le message
+                successDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+            function hideMessages() {
+                document.getElementById('error-message').classList.add('hidden');
+                document.getElementById('success-message').classList.add('hidden');
+            }
 
             // Gestion de la vérification CNI
             verifyCniBtn.addEventListener('click', function() {
+                hideMessages();
                 const cni = document.getElementById('cni').value.trim();
                 const login = document.getElementById('login').value.trim();
                 const adresse = document.getElementById('adresse').value.trim();
 
                 // Validation simple (accepte 12 ou 13 chiffres)
                 if (!cni || !/^\d{12,13}$/.test(cni)) {
-                    alert('Veuillez entrer un numéro CNI valide (12 ou 13 chiffres)');
+                    showError('Veuillez entrer un numéro CNI valide (12 ou 13 chiffres)');
                     return;
                 }
 
                 if (!login || login.length !== 9 || !/^(77|78|70|76|75)\d{7}$/.test(login)) {
-                    alert('Veuillez entrer un numéro de téléphone valide (9 chiffres: 77xxxxxxx)');
+                    showError('Veuillez entrer un numéro de téléphone valide (9 chiffres: 77xxxxxxx)');
                     return;
                 }
 
                 if (!adresse) {
-                    alert('Veuillez entrer votre adresse');
+                    showError('Veuillez entrer votre adresse');
                     return;
                 }
 
@@ -302,16 +351,19 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // CNI valide - rediriger pour afficher les données
-                        window.location.reload();
+                        // CNI valide - afficher succès et rediriger
+                        showSuccess('CNI vérifiée avec succès ! Redirection...');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
                     } else {
                         // CNI invalide
-                        alert(data.message || 'Le numéro de CNI n\'existe pas');
+                        showError(data.message || 'Le numéro de CNI n\'existe pas');
                     }
                 })
                 .catch(error => {
                     console.error('Erreur:', error);
-                    alert('Une erreur est survenue lors de la vérification');
+                    showError('Une erreur est survenue lors de la vérification');
                 })
                 .finally(() => {
                     // Restaurer l'interface

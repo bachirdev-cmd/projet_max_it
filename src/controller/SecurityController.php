@@ -184,16 +184,21 @@ class SecurityController extends AbstractController
                 exit();
             }
 
-            // Vérifier si le login existe déjà
+            // Vérifier si le login existe déjà (avec gestion d'erreur)
             error_log("Vérification existence du login...");
-            $userRepo = App::getDependency('UserRepository');
-            $existing = $userRepo->findByLogin($login);
-            if ($existing) {
-                error_log("Login déjà utilisé: '$login'");
-                echo json_encode(['success' => false, 'message' => 'Ce numéro de téléphone est déjà utilisé']);
-                exit();
+            try {
+                $userRepo = App::getDependency('UserRepository');
+                $existing = $userRepo->findByLogin($login);
+                if ($existing) {
+                    error_log("Login déjà utilisé: '$login'");
+                    echo json_encode(['success' => false, 'message' => 'Ce numéro de téléphone est déjà utilisé']);
+                    exit();
+                }
+                error_log("Login disponible");
+            } catch (\Exception $dbError) {
+                error_log("Erreur vérification login (continuons en mode dégradé): " . $dbError->getMessage());
+                // En cas d'erreur DB, on continue (mode dégradé)
             }
-            error_log("Login disponible");
 
             // Appel à l'API CNI
             error_log("Appel API CNI...");
@@ -221,8 +226,11 @@ class SecurityController extends AbstractController
             exit();
 
         } catch (\Exception $e) {
-            error_log("Erreur lors de la vérification CNI: " . $e->getMessage());
-            echo json_encode(['success' => false, 'message' => 'Une erreur est survenue lors de la vérification']);
+            error_log("=== EXCEPTION VÉRIFICATION CNI ===");
+            error_log("Message: " . $e->getMessage());
+            error_log("File: " . $e->getFile() . ":" . $e->getLine());
+            error_log("Trace: " . $e->getTraceAsString());
+            echo json_encode(['success' => false, 'message' => 'Erreur: ' . $e->getMessage()]);
             exit();
         }
     }
