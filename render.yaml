@@ -13,6 +13,6 @@ services:
         value: https://projet-max-it.onrender.com
       # Variables Railway Database (seule DATABASE_URL nécessaire)
       - key: DATABASE_URL
-      value: postgresql://postgres:NvkogRfRpUphAVmRnzpiKKUSKnHTwQMw@yamabiko.proxy.rlwy.net:16680/railway
+        value: postgresql://postgres:NvkogRfRpUphAVmRnzpiKKUSKnHTwQMw@yamabiko.proxy.rlwy.net:16680/railway
 
 # Base de données Railway (externe) - pas besoin de section databases
