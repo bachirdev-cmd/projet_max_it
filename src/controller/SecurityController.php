@@ -152,9 +152,15 @@ class SecurityController extends AbstractController
         }
 
         try {
-            $input = json_decode(file_get_contents('php://input'), true);
+            error_log("=== DÉBUT VÉRIFICATION CNI ===");
+            $rawInput = file_get_contents('php://input');
+            error_log("Raw input: " . $rawInput);
+            
+            $input = json_decode($rawInput, true);
+            error_log("Decoded input: " . print_r($input, true));
             
             if (!$input || !isset($input['cni'], $input['login'], $input['adresse'])) {
+                error_log("Données manquantes");
                 echo json_encode(['success' => false, 'message' => 'Données manquantes']);
                 exit();
             }
@@ -162,33 +168,42 @@ class SecurityController extends AbstractController
             $cni = trim($input['cni']);
             $login = trim($input['login']);
             $adresse = trim($input['adresse']);
+            
+            error_log("CNI: '$cni', Login: '$login', Adresse: '$adresse'");
 
             // Validation des données CNI (accepte 12 ou 13 chiffres)
             if (!preg_match('/^\d{12,13}$/', $cni)) {
+                error_log("Format CNI invalide: '$cni'");
                 echo json_encode(['success' => false, 'message' => 'Format CNI invalide (attendu: 12 ou 13 chiffres)']);
                 exit();
             }
 
             if (!preg_match('/^(77|78|70|76|75)\d{7}$/', $login)) {
-                echo json_encode(['success' => false, 'message' => 'Format téléphone invalide']);
+                error_log("Format téléphone invalide: '$login' (longueur: " . strlen($login) . ")");
+                echo json_encode(['success' => false, 'message' => 'Format téléphone invalide (9 chiffres requis: 77xxxxxxx)']);
                 exit();
             }
 
             // Vérifier si le login existe déjà
+            error_log("Vérification existence du login...");
             $userRepo = App::getDependency('UserRepository');
             $existing = $userRepo->findByLogin($login);
             if ($existing) {
+                error_log("Login déjà utilisé: '$login'");
                 echo json_encode(['success' => false, 'message' => 'Ce numéro de téléphone est déjà utilisé']);
                 exit();
             }
+            error_log("Login disponible");
 
             // Appel à l'API CNI
+            error_log("Appel API CNI...");
             $cniApiService = App::getDependency('CniApiService');
             
             // Mode simulation désactivé en production
             // $cniApiService->enableMockMode();
             
             $cniData = $cniApiService->verifyCni($cni);
+            error_log("Résultat API CNI: " . print_r($cniData, true));
 
             if (!$cniData) {
                 echo json_encode(['success' => false, 'message' => 'Le numéro de CNI n\'existe pas']);

@@ -273,7 +273,7 @@
                 }
 
                 if (!login || login.length !== 9 || !/^(77|78|70|76|75)\d{7}$/.test(login)) {
-                    alert('Veuillez entrer un numéro de téléphone valide');
+                    alert('Veuillez entrer un numéro de téléphone valide (9 chiffres: 77xxxxxxx)');
                     return;
                 }
 
