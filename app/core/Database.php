@@ -6,14 +6,22 @@ use PDO;
 
 
 class Database {
-    private PDO $pdo;
+    protected PDO $pdo;
 
     public function __construct()
     {
+        $dsn = $_ENV['DSN'] ?? '';
+        $username = $_ENV['DB_USERNAME'] ?? '';
+        $password = $_ENV['DB_PASSWORD'] ?? '';
+        
+        if (empty($dsn) || $dsn === 'pgsql:host=;port=0;dbname=') {
+            throw new \Exception('Database configuration not available');
+        }
+        
         $this->pdo = new PDO(
-            $_ENV['DSN'],
-            $_ENV['DB_USERNAME'],
-            $_ENV['DB_PASSWORD'],
+            $dsn,
+            $username,
+            $password,
             [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
