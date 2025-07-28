@@ -3,8 +3,7 @@ namespace App\Core;
 
 use PDO;
 
-class DatabaseSafe {
-    private ?PDO $pdo = null;
+class DatabaseSafe extends Database {
     private bool $connected = false;
 
     public function __construct()
@@ -18,29 +17,29 @@ class DatabaseSafe {
             if (!$dsn || empty($dsn) || $dsn === 'pgsql:host=;port=0;dbname=') {
                 error_log("Base de données désactivée - variables d'environnement manquantes");
                 $this->connected = false;
+                // Créer un PDO mock pour éviter les erreurs
+                $this->createMockPdo();
                 return;
             }
 
-            $this->pdo = new PDO(
-                $dsn,
-                $username,
-                $password,
-                [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                    PDO::ATTR_TIMEOUT => 5
-                ]
-            );
+            // Appeler le constructeur parent
+            parent::__construct();
             $this->connected = true;
             error_log("Connexion base de données réussie");
         } catch (\Exception $e) {
             error_log("Connexion base de données échouée: " . $e->getMessage());
             $this->connected = false;
+            $this->createMockPdo();
         }
     }
 
-    public function getPdo(): ?PDO {
-        return $this->connected ? $this->pdo : null;
+    private function createMockPdo() {
+        // Créer un PDO SQLite en mémoire comme fallback
+        try {
+            $this->pdo = new PDO('sqlite::memory:');
+        } catch (\Exception $e) {
+            error_log("Impossible de créer le PDO mock: " . $e->getMessage());
+        }
     }
 
     public function isConnected(): bool {
