@@ -9,9 +9,8 @@ services:
     envVars:
       - key: APP_ENV
         value: production
-      # APP_URL sera ajouté après le déploiement
-      # - key: APP_URL
-      #   value: https://votre-url-render.onrender.com
+      - key: APP_URL
+        value: https://projet-max-it.onrender.com
       # Variables Railway Database
       - key: DATABASE_URL
         value: postgresql://postgres:NvkogRfRpUphAVmRnzpiKKUSKnHTwQMw@yamabiko.proxy.rlwy.net:16680/railway

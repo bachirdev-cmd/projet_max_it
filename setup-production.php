@@ -8,7 +8,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 echo "=== Configuration de la production ===\n";
 
 try {
-    // Chargement des variables d'environnement
+    // Chargement optionnel des variables d'environnement
     if (file_exists(__DIR__ . '/.env')) {
         $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
         $dotenv->load();
