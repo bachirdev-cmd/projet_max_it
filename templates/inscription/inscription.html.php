@@ -64,9 +64,9 @@
                                    id="cni" 
                                    name="cni" 
                                    value="<?= Helper::clean($oldData['cni'] ?? '') ?>"
-                                   placeholder="1234567890123" 
+                                   placeholder="199720000166 (12-13 chiffres)" 
                                    maxlength="13" 
-                                   pattern="[0-9]{13}"
+                                   pattern="[0-9]{12,13}"
                                    class="w-full px-4 py-3 bg-gray-300 rounded-lg border-0 focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-700 placeholder-gray-600 <?= isset($errors['cni']) ? 'ring-2 ring-red-500' : '' ?>">
                             <i class="fas fa-id-card absolute right-3 top-3 text-gray-600"></i>
                         </div>
@@ -266,9 +266,9 @@
                 const login = document.getElementById('login').value.trim();
                 const adresse = document.getElementById('adresse').value.trim();
 
-                // Validation simple
-                if (!cni || cni.length !== 13 || !/^\d{13}$/.test(cni)) {
-                    alert('Veuillez entrer un numéro CNI valide de 13 chiffres');
+                // Validation simple (accepte 12 ou 13 chiffres)
+                if (!cni || !/^\d{12,13}$/.test(cni)) {
+                    alert('Veuillez entrer un numéro CNI valide (12 ou 13 chiffres)');
                     return;
                 }
 

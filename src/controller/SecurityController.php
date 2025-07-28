@@ -163,9 +163,9 @@ class SecurityController extends AbstractController
             $login = trim($input['login']);
             $adresse = trim($input['adresse']);
 
-            // Validation des données
-            if (!preg_match('/^\d{13}$/', $cni)) {
-                echo json_encode(['success' => false, 'message' => 'Format CNI invalide']);
+            // Validation des données CNI (accepte 12 ou 13 chiffres)
+            if (!preg_match('/^\d{12,13}$/', $cni)) {
+                echo json_encode(['success' => false, 'message' => 'Format CNI invalide (attendu: 12 ou 13 chiffres)']);
                 exit();
             }
 

@@ -1,5 +1,5 @@
-# Dockerfile pour MaxIT Application
-FROM php:8.2-apache
+# Dockerfile pour MaxIT Application - Railway
+FROM php:8.2-cli
 
 # Installation des extensions PHP nécessaires
 RUN apt-get update && apt-get install -y \
@@ -17,12 +17,8 @@ RUN apt-get update && apt-get install -y \
 # Installation de Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Configuration Apache
-RUN a2enmod rewrite
-COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
-
 # Copie du code source
-WORKDIR /var/www/html
+WORKDIR /app
 COPY . .
 
 # Installation des dépendances PHP
@@ -30,14 +26,13 @@ RUN composer install --no-dev --optimize-autoloader
 
 # Permissions pour les uploads
 RUN mkdir -p public/uploads/cni && \
-    chown -R www-data:www-data public/uploads && \
     chmod -R 755 public/uploads
 
 # Configuration de production
 RUN php setup-production.php || true
 
-# Port exposé
-EXPOSE 80
+# Port exposé (Railway utilise la variable $PORT)
+EXPOSE $PORT
 
-# Commande de démarrage
-CMD ["apache2-foreground"]
+# Commande de démarrage pour Railway
+CMD php -S 0.0.0.0:$PORT -t public

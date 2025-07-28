@@ -110,11 +110,6 @@ class CniApiService {
                 return false;
             }
             
-            if ($httpCode !== 200) {
-                error_log("Code de réponse HTTP inattendu: $httpCode");
-                return false;
-            }
-
             // Vérifier si la réponse contient du HTML (erreur)
             if (stripos($response, '<html') !== false || stripos($response, 'Fatal error') !== false) {
                 error_log("Réponse HTML détectée - erreur serveur");
@@ -133,6 +128,12 @@ class CniApiService {
             // Vérifier la structure de réponse de votre API
             if (isset($responseData['status']) && $responseData['status'] === 'ERROR') {
                 error_log("CNI non trouvée selon l'API: " . ($responseData['message'] ?? 'Erreur inconnue'));
+                return false;
+            }
+
+            // L'API retourne 200/201 même pour les erreurs, donc on vérifie d'abord le status
+            if (!in_array($httpCode, [200, 201])) {
+                error_log("Code de réponse HTTP inattendu: $httpCode");
                 return false;
             }
 
