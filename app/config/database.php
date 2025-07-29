@@ -23,6 +23,13 @@ if ($databaseUrl && !empty($databaseUrl)) {
     $_ENV['DB_HOST'] = $parsed['host'];
     $_ENV['DB_PORT'] = $parsed['port'] ?? 5432;
     $dbName = ltrim($parsed['path'], '/');
+    
+    // CORRECTION FORCÉE pour le bug railway_
+    $dbName = trim($dbName, '_'); // Supprimer les underscores en trop
+    if ($dbName === 'railway_' || $dbName === 'railway__') {
+        $dbName = 'railway';
+    }
+    
     $_ENV['DB_NAME'] = $dbName;
     $_ENV['DB_USERNAME'] = $parsed['user'];
     $_ENV['DB_PASSWORD'] = $parsed['pass'];
@@ -31,12 +38,12 @@ if ($databaseUrl && !empty($databaseUrl)) {
     error_log("Parsed DB_NAME from URL: '$dbName'");
     error_log("Final DB_NAME: " . $_ENV['DB_NAME']);
     
-    // Reconstruction du DSN
+    // Reconstruction du DSN avec le nom corrigé
     $_ENV['DSN'] = sprintf(
         'pgsql:host=%s;port=%d;dbname=%s',
         $_ENV['DB_HOST'],
         $_ENV['DB_PORT'],
-        $_ENV['DB_NAME']
+        $dbName  // Utiliser directement $dbName corrigé
     );
 } else {
     // Variables individuelles (depuis render.yaml)

@@ -5,6 +5,7 @@ services:
     buildCommand: |
       composer install --no-dev --optimize-autoloader
       php setup-production.php
+      echo "Build completed - railway fix applied"
     startCommand: php -S 0.0.0.0:$PORT -t public/
     envVars:
       - key: APP_ENV
