@@ -171,10 +171,10 @@ class SecurityController extends AbstractController
             
             error_log("CNI: '$cni', Login: '$login', Adresse: '$adresse'");
 
-            // Validation des données CNI (accepte 12 ou 13 chiffres)
-            if (!preg_match('/^\d{12,13}$/', $cni)) {
+            // Validation des données CNI (exactement 13 chiffres)
+            if (!preg_match('/^\d{13}$/', $cni)) {
                 error_log("Format CNI invalide: '$cni'");
-                echo json_encode(['success' => false, 'message' => 'Format CNI invalide (attendu: 12 ou 13 chiffres)']);
+                echo json_encode(['success' => false, 'message' => 'Format CNI invalide (exactement 13 chiffres requis)']);
                 exit();
             }
 

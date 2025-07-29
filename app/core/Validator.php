@@ -72,8 +72,8 @@ class Validator
         // Validation CNI
         if (empty($data['cni'])) {
             self::$errors['cni'] = "Le numéro CNI est obligatoire";
-        } elseif (!preg_match('/^[0-9]{12,13}$/', $data['cni'])) {
-            self::$errors['cni'] = "Le numéro CNI doit contenir 12 ou 13 chiffres";
+        } elseif (!preg_match('/^[0-9]{13}$/', $data['cni'])) {
+            self::$errors['cni'] = "Le numéro CNI doit contenir exactement 13 chiffres";
         }
 
         // Validation téléphone

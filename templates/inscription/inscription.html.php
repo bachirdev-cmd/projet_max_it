@@ -73,16 +73,16 @@
                     <!-- CNI -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Numéro de carte d'identité (13 chiffres)
+                            Numéro de carte d'identité (exactement 13 chiffres)
                         </label>
                         <div class="relative">
                             <input type="text" 
                                    id="cni" 
                                    name="cni" 
                                    value="<?= Helper::clean($oldData['cni'] ?? '') ?>"
-                                   placeholder="199720000166 (12-13 chiffres)" 
+                                   placeholder="1997200001666 (13 chiffres)" 
                                    maxlength="13" 
-                                   pattern="[0-9]{12,13}"
+                                   pattern="[0-9]{13}"
                                    class="w-full px-4 py-3 bg-gray-300 rounded-lg border-0 focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-700 placeholder-gray-600 <?= isset($errors['cni']) ? 'ring-2 ring-red-500' : '' ?>">
                             <i class="fas fa-id-card absolute right-3 top-3 text-gray-600"></i>
                         </div>
@@ -315,9 +315,9 @@
                 const login = document.getElementById('login').value.trim();
                 const adresse = document.getElementById('adresse').value.trim();
 
-                // Validation simple (accepte 12 ou 13 chiffres)
-                if (!cni || !/^\d{12,13}$/.test(cni)) {
-                    showError('Veuillez entrer un numéro CNI valide (12 ou 13 chiffres)');
+                // Validation simple (exactement 13 chiffres)
+                if (!cni || !/^\d{13}$/.test(cni)) {
+                    showError('Veuillez entrer un numéro CNI valide (exactement 13 chiffres)');
                     return;
                 }
 
